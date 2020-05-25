@@ -23,7 +23,7 @@ import { addPost } from "../store/actions/postActions";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import { AppHeaderIcon } from "../components/AppHeaderIcon";
 import Ripple from "react-native-material-ripple";
-
+import ReaderAPI from "../services/ReaderAPI";
 
 export const CreateScreen = ({ navigation }) => {
     const [text, setText] = useState('');
@@ -67,12 +67,19 @@ export const CreateScreen = ({ navigation }) => {
             img: image,
         };
 
-        dispatch(addPost(post));
-        setText('');
-        setImage(null);
-        navigation.dispatch(CommonActions.navigate({
-            name: 'MainScreen'
-        }));
+        if (text && image) {
+            ReaderAPI.sendImage(text, image)
+                .then(resp => {
+                    console.log(resp);
+                    dispatch(addPost(post));
+                    setText('');
+                    setImage(null);
+                    navigation.dispatch(CommonActions.navigate({
+                        name: 'MainScreen'
+                    }));
+                })
+                .catch(e => console.log(e));
+        }
     };
 
     navigation.setOptions({
